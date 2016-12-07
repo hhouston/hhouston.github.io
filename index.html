@@ -7,7 +7,7 @@
 
 <body>
     <header>
-      <img src="https://d3c5s1hmka2e2b.cloudfront.net/uploads/topic/image/4/appacademy.png" alt="App Academy Logo">
+        <img src="https://d3c5s1hmka2e2b.cloudfront.net/uploads/topic/image/4/appacademy.png" alt="App Academy Logo">
         <nav>
             <ul>
                 <li><a href="#ingredients">Prepare</a></li>
@@ -30,14 +30,14 @@
         <figure>
             <img src="http://toriavey.com/images/2010/07/Shakshuka-Close-640x480.jpg" alt="Shakshukah Recipe">
             <figcaption>
-              <a href="http://hypem.com/">More on prepare</a>
+                <a href="http://hypem.com/">More on prepare</a>
             </figcaption>
         </figure>
 
 
         <h2 id="mix">Mix it up</h2>
         <p>
-          This is a discription about me mixing my food.
+            This is a discription about me mixing my food.
         </p>
 
         <h2 id="serve">Serve like this</h2>
@@ -45,13 +45,46 @@
             <li>put chicken with rice</li>
             <li>put cheese on chicken/rice</li>
             <li>apply heat</li>
-        <ol>
+        </ol>
     </section>
 
 
     <section>
-      <form action="/reviews" method="post"></form>
+        <form action="/reviews" method="post">
+
+          <label for="reviewer">Name: </label>
+          <input type="text" name="reviewer">
+
+            <label for="rating">Rating: </label>
+            1<input type="radio" name="rating" value="1" checked>
+            2<input type="radio" name="rating" value="2">
+            3<input type="radio" name="rating" value="3">
+            4<input type="radio" name="rating" value="4">
+            5<input type="radio" name="rating" value="5">
+
+            <label for="cooking expertise">Cooking Expertise</label>
+
+            <select id="cooking expertise">
+              <option disabled="true" selected="true" value="Select Cooking Expertise">Select Cooking Expertise</option>
+
+              <option value="Sometimes Cook">Sometimes Cook</option>
+
+              <option value="Cook Everyday">Cook Everyday</option>
+
+              <option value="Cooking is a hobby">Cooking is a hobby</option>
+
+              <option value="Profession Chef">Profession Chef</option>
+            </select>
+
+            <label for="review">Review
+                <textarea id="review" cols=40 rows=8></textarea>
+            </label>
+
+            <input type="submit" value="Submit">
+        </form>
+
     </section>
+
     <footer>
         <p>Original Reciple by ME</p>
     </footer>
