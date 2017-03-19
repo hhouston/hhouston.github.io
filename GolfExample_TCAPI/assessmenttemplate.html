@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Assessment</title>
+    <style type="text/css" media="screen">
+        @import url( css/style.css );
+    </style>
+
+    <script src="scripts/TinCanJS/build/tincan-min.js"></script>
+    <script src="scripts/common.js"></script>
+    <script type="text/javascript">
+        var activityId = GolfExample.CourseActivity.id + "/GolfAssessment";
+        var testObj = {
+            id: activityId,
+            definition: {
+                name: {
+                    "en-US": "Golf Example Assessment"
+                },
+                description: {
+                    "en-US": "An Assessment for the Golf Example course."
+                },
+                type: "http://adlnet.gov/expapi/activities/assessment"
+            }
+        };
+        var assessmentStartTimestamp = new Date();
+
+        var tincan = new TinCan (
+            {
+                url: window.location.href,
+                activity: testObj
+            }
+        );
+
+        //Each go at the assessment is a new attempt at the assessment; there's no bookmarking within the assessment
+        var stmt = {
+            verb: {
+                id: "http://adlnet.gov/expapi/verbs/attempted",
+                display: {
+                    "en-US" : "attempted"
+                }
+            },
+            object: testObj,
+            context: GolfExample.getContext(GolfExample.CourseActivity.id, true),
+            result: {
+                duration: "PT0S"
+            }
+        };
+
+        tincan.sendStatement(stmt);
+
+        var QUESTION_TYPE_CHOICE = "choice",
+            QUESTION_TYPE_TF = "true-false",
+            QUESTION_TYPE_NUMERIC = "numeric";
+
+        function Question(id, text, type, answers, correctAnswer, objectiveId){
+            this.Id = id;
+            this.Text = text;
+            this.Type = type;
+            this.Answers = answers;
+            this.CorrectAnswer = correctAnswer;
+            this.ObjectiveId = objectiveId;
+        }
+
+        function Test(questions){
+            this.Questions = questions;
+        }
+        Test.prototype.AddQuestion = function(question) {
+            this.Questions[this.Questions.length] = question;
+        }
+
+        var test = new Test([]);
+
+        function CheckNumeric(obj){
+            var userText = new String(obj.value);
+            var numbersRegEx = /[^0-9]/g;
+            if (userText.search(numbersRegEx) >= 0){
+                alert("Please enter only numeric values.");
+                obj.value = userText.replace(numbersRegEx, "");
+            }
+        }
+
+        // record the results of a test, passes in score as a percentage
+        function GetRecordTestStatement(score, activityId, parentActivityId, duration, isAssessment){
+            // send score
+            var scaledScore = score / 100,
+                success = (scaledScore >= 0.8),
+                verb;
+            if (success){
+                verb = {
+                    id: "http://adlnet.gov/expapi/verbs/passed",
+                    display: {
+                        "en-US" : "passed"
+                    }
+                }
+            } else {
+                verb = {
+                    id: "http://adlnet.gov/expapi/verbs/failed",
+                    display: {
+                        "en-US" : "failed"
+                    }
+                }
+            }
+            var stmt = {
+                verb: verb,
+                object: {
+                    id: activityId
+                },
+                result: {
+                    score: {
+                        scaled: scaledScore,
+                        raw: score,
+                        min: 0,
+                        max: 100
+                    },
+                    success: success,
+                    completion: true,
+                    duration: duration
+                },
+                context: GolfExample.getContext(parentActivityId, isAssessment)
+            };
+
+            return stmt;
+        }
+
+        // record the results of a question
+        function GetQuestionAnswerStatement(id, questionText, questionChoices, questionType, learnerResponse, correctAnswer, wasCorrect, activityId){
+            if (typeof console !== 'undefined') {
+                console.log("GetQuestionAnswerStatement");
+            }
+
+            strCorrectAnswer = String(correctAnswer);
+
+            //send question info
+            var qObj = {
+                id: id,
+                definition: {
+                    type: "http://adlnet.gov/expapi/activities/cmi.interaction",
+                    description: {
+                        "en-US": questionText
+                    },
+                    interactionType: questionType,
+                    correctResponsesPattern: [
+                        strCorrectAnswer
+                    ]
+                }
+            };
+
+            //format numeric response pattern.
+            if (qObj.definition.interactionType == "numeric"){
+                qObj.definition.correctResponsesPattern[0] = strCorrectAnswer + "[:]" + strCorrectAnswer;
+            }
+
+            if (questionChoices !== null && questionChoices.length > 0) {
+                var choices = [];
+                for (var i = 0; i < questionChoices.length; i++) {
+                    var choice = questionChoices[i];
+                    choices.push(
+                        {
+                            id: choice.replace(/\s+/g, '-'),
+                            description: {
+                                "en-US": choice
+                            }
+                        }
+                    );
+                }
+                if (typeof console !== 'undefined') {
+                    console.log(qObj);
+                }
+                qObj.definition.choices = choices;
+                qObj.definition.correctResponsesPattern = [
+                    correctAnswer.replace(/\s+/g, '-')
+                ];
+                learnerResponse = learnerResponse.replace(/\s+/g, '-');
+            }
+
+            return {
+                verb: {
+                    id: "http://adlnet.gov/expapi/verbs/answered",
+                    display: {
+                        "en-US" : "answered"
+                    }
+                },
+                object: qObj,
+                result: {
+                    response: learnerResponse,
+                    success: wasCorrect
+                },
+                context: GolfExample.getContext(activityId, true)
+            }
+        }
+
+        function SubmitAnswers(){
+            var correctCount = 0;
+            var totalQuestions = test.Questions.length;
+
+            var resultsSummary = "";
+
+            var answerStatements = [];
+
+            for (var i in test.Questions){
+                var question = test.Questions[i];
+
+                var wasCorrect = false;
+                var correctAnswer = null;
+                var learnerResponse = "";
+
+                switch (question.Type){
+                    case QUESTION_TYPE_CHOICE:
+
+                        for (var answerIndex = 0; answerIndex < question.Answers.length; answerIndex++){
+                            if (question.CorrectAnswer == question.Answers[answerIndex]){
+                                correctAnswer = question.Answers[answerIndex];
+                            }
+                            if (document.getElementById("question_" + question.Id + "_" + answerIndex).checked == true){
+                                learnerResponse = question.Answers[answerIndex];
+                            }
+                        }
+
+                    break;
+
+                    case QUESTION_TYPE_TF:
+
+                        if (document.getElementById("question_" + question.Id + "_True").checked == true){
+                            learnerResponse = "true";
+                        }
+                        if (document.getElementById("question_" + question.Id + "_False").checked == true){
+                           learnerResponse = "false";
+                        }
+
+                        if (question.CorrectAnswer == true){
+                            correctAnswer = "true";
+                        }
+                        else{
+                            correctAnswer = "false";
+                        }
+                    break;
+
+                    case QUESTION_TYPE_NUMERIC:
+                        correctAnswer = question.CorrectAnswer;
+                        learnerResponse = document.getElementById("question_" + question.Id + "_Text").value;
+                    break;
+
+                    default:
+                        alert("invalid question type detected");
+                    break;
+                }
+
+                wasCorrect = (correctAnswer == learnerResponse);
+                if (wasCorrect) {correctCount++;}
+
+                answerStatements.unshift(
+                    GetQuestionAnswerStatement(
+                        test.Questions[i].Id,
+                        test.Questions[i].Text,
+                        test.Questions[i].Answers,
+                        test.Questions[i].Type,
+                        learnerResponse,
+                        correctAnswer,
+                        wasCorrect,
+                        activityId
+                    )
+                );
+
+                resultsSummary += "<div class='questionResult'><h3>Question " + i + "</h3>";
+                if (wasCorrect) {
+                    resultsSummary += "<em>Correct</em><br>"
+                }
+                else{
+                    resultsSummary += "<em>Incorrect</em><br>"
+                    resultsSummary += "Your answer: " + learnerResponse + "<br>"
+                    resultsSummary += "Correct answer: " + correctAnswer + "<br>"
+                }
+                resultsSummary += "</div>";
+            }
+
+            var score = Math.round(correctCount * 100 / totalQuestions);
+            resultsSummary = "<h3>Score: " + score + "</h3>" + resultsSummary;
+            document.getElementById("test").innerHTML = resultsSummary;
+
+            var assessmentAttemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration( Math.abs((new Date()) - assessmentStartTimestamp) ),
+                attemptDuration = TinCan.Utils.convertMillisecondsToISO8601Duration(parent.bookmarkingData.getAttemptDuration());
+            answerStatements.push(GetRecordTestStatement(score, activityId, GolfExample.CourseActivity.id, assessmentAttemptDuration, true));
+            answerStatements.push(GetRecordTestStatement(score, GolfExample.CourseActivity.id, null, attemptDuration, false));
+
+            // send question answers
+            tincan.sendStatements(answerStatements);
+
+            parent.bookmarkingData.setCompletion(true);
+            parent.bookmarkingData.save();
+        }
+
+        function RenderTest(test){
+            document.write ("<div id='test'><form id='frmTest' action='#'>");
+
+            for (var i in test.Questions){
+                var question = test.Questions[i];
+
+                document.write ("<div id='question_" + question.Id + "' class='question'>");
+                document.write (question.Text);
+
+                switch (question.Type){
+                    case QUESTION_TYPE_CHOICE:
+                        var ansIndex = 0;
+                        for (var j in question.Answers){
+                            var answer = question.Answers[j];
+                            document.write("<div ");
+                            if (question.CorrectAnswer == answer) {document.write("class='correctAnswer'");} else{document.write("class='answer'");}
+                            document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_" + ansIndex + "'/>" + answer + "</div>");
+                            ansIndex++;
+                        }
+
+                    break;
+
+                    case QUESTION_TYPE_TF:
+
+                        document.write("<div ");
+                        if (question.CorrectAnswer == true) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
+                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_True'/>True</div>");
+
+                        document.write("<div ");
+                        if (question.CorrectAnswer == false) {document.write("class='correctAnswer'");}else{document.write("class='answer'");}
+                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_False'/>False</div>");
+
+                    break;
+
+                    case QUESTION_TYPE_NUMERIC:
+                        document.write("<div class='correctAnswer'><input type='text' value='' id='question_" + question.Id + "_Text' onchange='CheckNumeric(this)'/> (");
+                        document.write(question.CorrectAnswer + ")</div>");
+                    break;
+
+                    default:
+                        alert("invalid question type detected");
+                    break;
+                }
+                document.write ("</div>");      //close out question div
+            }
+            document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
+            document.write ("</form></div>");      //close out test div
+        }
+    </script>
+    <script src="Etiquette/questions.js"></script>
+    <script src="Handicapping/questions.js"></script>
+    <script src="HavingFun/questions.js"></script>
+    <script src="Playing/questions.js"></script>
+    <script src="scripts/contentfunctions.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+<h1>Knowledge Check</h1>
+<script type="text/javascript">
+    RenderTest(test);
+</script>
+</body>
+</html>
