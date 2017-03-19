@@ -286,6 +286,8 @@
             // send question answers
             tincan.sendStatements(answerStatements);
 
+            console.log("answerStatements:", answerStatements);
+
             parent.bookmarkingData.setCompletion(true);
             parent.bookmarkingData.save();
         }
@@ -335,7 +337,7 @@
                 }
                 document.write ("</div>");      //close out question div
             }
-            document.write("<input type='button' value='Submit Answers' onclick='SubmitAnswers();' />");
+            document.write("<input type='button' value='SubmitAnswers' onclick='SubmitAnswers();' />");
             document.write ("</form></div>");      //close out test div
         }
     </script>
