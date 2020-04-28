@@ -1,0 +1,212 @@
+html, body {
+  font-family: serif;
+  font-size: 48px;
+  background-color: black;
+
+  max-width: 100%;
+  padding-bottom:60px;   /* Height of the footer */
+
+  margin: auto;
+  padding: 0;
+  overflow:auto;
+}
+
+page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  min-height: 100%;
+  border: white solid 1px;
+}
+
+.container:hover .image {
+  opacity: 0.3;
+}
+
+.container:hover .middle {
+  opacity: 1;
+}
+
+.container:hover {
+  transition: .5s ease;
+}
+
+img {
+  width: 100%;
+}
+
+.image {
+  opacity: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: .5s ease;
+  backface-visibility: hidden;
+}
+
+.pic-container {
+
+}
+
+.middle {
+  transition: .5s ease;
+  opacity: 0;
+  position: absolute;
+}
+
+.middle:hover {
+}
+
+.text {
+  max-width: 100%;
+
+  border: white solid 1px;
+  color: white;
+  font-size: 16px;
+  padding: 16px 32px;
+}
+
+.para {
+  max-width: 100%;
+  color: black;
+  font-size: 24px;
+  padding: 16px 32px;
+}
+
+#ll5:hover {
+  color: #2afd39;
+}
+
+#extra:hover {
+  color: red;
+  background-color: black;
+}
+
+#towerdefense:hover {
+  color: black;
+  background-color: white;
+}
+
+#scarebnb:hover {
+  color: orange;
+}
+
+.link {
+  font-size: 28px;
+  text-decoration: none;
+  color: #551A8B;
+}
+.link:hover {
+  color: #2afd39;
+}
+
+
+.hide {
+  display: none;
+}
+
+.show {
+  padding-top: 30px;
+  width: 100%;
+}
+
+.lucidlab5 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: 'Roboto Mono';
+  width: 100%;
+}
+
+.lucidlab5:hover  {
+  /*border: #2afd39 solid 3px;*/
+}
+.section2 {
+  margin-top: 50px;
+  margin-bottom: 50px;
+  width: 100%;
+  height: 500px;
+  display: flex;
+  flex-direction: row;
+}
+
+.rocket-crm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: 'Raleway';
+  color: red;
+  font-size: 25px;
+  margin: 50px;
+  width: 50%;
+  height: 300px;
+  border: red solid 1px;
+}
+
+.rocket-crm:hover {
+  z-index: 3;
+}
+
+.towerdefense {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: 'Roboto Mono';
+  color: white;
+  font-size: 25px;
+  margin: 50px;
+  width: 50%;
+  height: 300px;
+  border: white solid 1px;
+}
+
+.scarebnb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: 'Tangerine';
+  width: 100%;
+  height: 500px;
+  border: orange solid 1px;
+  color: white;
+}
+
+#scareInfo, #ll5Info {
+  font-family: 'PT Sans';
+  font-size: 35px;
+  margin-top: 20px;
+  background-color: white;
+}
+
+#ll5Info {
+  height: 800px;
+}
+
+.title {
+  color: white;
+}
+
+.footer {
+  z-index: 10;
+  position: fixed;
+  bottom:0;
+  width:100%;
+  height:60px;   /* Height of the footer */
+  color: white;
+
+  background-color: black;
+  border-top: white solid 1px;
+  padding: 2px;
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-around;
+
+}
