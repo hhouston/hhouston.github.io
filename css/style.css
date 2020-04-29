@@ -21,6 +21,10 @@ page {
   border: white solid 1px;
 }
 
+.page {
+  margin: 40px;
+}
+
 .container:hover .image {
   opacity: 0.3;
 }
@@ -44,10 +48,6 @@ img {
   height: auto;
   transition: .5s ease;
   backface-visibility: hidden;
-}
-
-.pic-container {
-
 }
 
 .middle {
@@ -85,8 +85,8 @@ img {
 }
 
 #towerdefense:hover {
-  color: black;
-  background-color: white;
+  color: green;
+  background-color: black;
 }
 
 #scarebnb:hover {
@@ -157,18 +157,19 @@ img {
   align-items: center;
 
   font-family: 'Roboto Mono';
-  color: white;
+  color: green;
   font-size: 25px;
   margin: 50px;
   width: 50%;
   height: 300px;
-  border: white solid 1px;
+  border: green solid 1px;
 }
 
 .scarebnb {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 100px;
 
   font-family: 'Tangerine';
   width: 100%;
@@ -208,5 +209,4 @@ img {
 .footer-container {
   display: flex;
   justify-content: space-around;
-
 }
