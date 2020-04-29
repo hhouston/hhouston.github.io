@@ -25,10 +25,31 @@ page {
   margin: 40px;
 }
 
+.profile {
+  display: flex;
+  justify-content: space-between;
+}
+
+.projects {
+  margin-top: 50px;
+  margin-bottom: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
 .container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  margin: 50px;
+  width: 50%;
+
+  max-width: 700px;
+  min-height: 300px;
 }
 
 .container:hover .image {
@@ -62,7 +83,11 @@ img {
   position: absolute;
 }
 
-.middle:hover {
+.bio {
+  color: white;
+  font-family: 'Roboto Mono';
+  font-size: 30px;
+  font-size: 2.5vw;
 }
 
 .text {
@@ -127,28 +152,18 @@ img {
 
 .lucidlab5 {
   font-family: 'Roboto Mono';
+  border: #551A8B solid 1px;
   width: 100%;
 }
 
 .lucidlab5:hover  {
   /*border: #2afd39 solid 3px;*/
 }
-.section2 {
-  margin-top: 50px;
-  margin-bottom: 50px;
-  width: 100%;
-  height: 500px;
-  display: flex;
-  flex-direction: row;
-}
 
 .burst-gallery {
   font-family: 'Raleway';
   color: orange;
   font-size: 25px;
-  margin: 50px;
-  width: 50%;
-  height: 300px;
   border: orange solid 1px;
   background-color: #FFF;
 }
@@ -161,18 +176,11 @@ img {
   font-family: 'Roboto Mono';
   color: green;
   font-size: 25px;
-  margin: 50px;
-  width: 50%;
-  height: 300px;
   border: green solid 1px;
 }
 
 .scarebnb {
-  margin-bottom: 100px;
-
   font-family: 'Tangerine';
-  width: 100%;
-  height: 500px;
   border: orange solid 1px;
   color: white;
 }
